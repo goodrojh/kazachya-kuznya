@@ -6,6 +6,7 @@ dist/
 
 # Исходники изображений и служебные выгрузки (в репозиторий не нужны)
 site/raw/
+site/prods.json
 site/sheet.jpg
 site/rev.jpg
 home.html

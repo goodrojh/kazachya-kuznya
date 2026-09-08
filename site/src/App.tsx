@@ -27,6 +27,8 @@ import {
   img,
   type SocialKey,
 } from './data'
+import { LEGAL } from './legal'
+import { PRODUCT_DETAILS } from './product-details'
 
 /* ------------------------------------------------------------------ *
  * Общие хелперы
@@ -509,6 +511,7 @@ function QtyStepper({ sku, qty }: { sku: string; qty: number }) {
 
 function CartDrawer() {
   const cart = useCart()
+  const { openLegal } = useUi()
   const [checkout, setCheckout] = useState(false)
   const [form, setForm] = useState({ name: '', phone: '', city: '', delivery: DELIVERY[0], note: '' })
 
@@ -705,6 +708,26 @@ function CartDrawer() {
               <p className="mt-4 text-[11px] leading-5 text-ash">
                 Доставка оплачивается отдельно согласно тарифу транспортной компании. Возможна оплата наличными,
                 картой, переводом или наложенным платежом.
+              </p>
+
+              <p className="mt-3 text-[11px] leading-5 text-ash/80">
+                Отправляя заказ, вы принимаете{' '}
+                <button
+                  type="button"
+                  onClick={() => openLegal('offer')}
+                  className="underline decoration-bone/30 underline-offset-2 transition-colors hover:text-brass"
+                >
+                  договор оферты
+                </button>{' '}
+                и соглашаетесь с{' '}
+                <button
+                  type="button"
+                  onClick={() => openLegal('privacy')}
+                  className="underline decoration-bone/30 underline-offset-2 transition-colors hover:text-brass"
+                >
+                  политикой конфиденциальности
+                </button>
+                .
               </p>
             </div>
 
@@ -1343,13 +1366,20 @@ function Catalog() {
  * ------------------------------------------------------------------ */
 
 function ProductCard({ product, style }: { product: (typeof PRODUCTS)[number]; style?: CSSProperties }) {
+  const { openProduct } = useUi()
   const off = discount(product.price, product.oldPrice)
+  const open = () => openProduct(product.sku)
   return (
     <article
       style={style}
       className="group flex flex-col overflow-hidden rounded-xl border border-bone/10 bg-coal transition-colors duration-300 hover:border-brass/45 md:rounded-2xl"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-steel min-[420px]:aspect-square">
+      <button
+        type="button"
+        onClick={open}
+        aria-label={`Подробнее: ${product.name}`}
+        className="relative block aspect-[4/3] w-full overflow-hidden bg-steel min-[420px]:aspect-square"
+      >
         <img
           src={img(product.image)}
           alt={product.name}
@@ -1359,7 +1389,11 @@ function ProductCard({ product, style }: { product: (typeof PRODUCTS)[number]; s
           height={860}
           className="photo-tone absolute inset-0 h-full w-full object-cover group-hover:scale-[1.05]"
         />
-        <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5 md:left-3.5 md:top-3.5">
+        <span className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-center gap-1.5 bg-ink/85 py-2.5 text-[11px] font-bold uppercase tracking-wider text-brass backdrop-blur-sm transition-transform duration-300 ease-smooth group-hover:translate-y-0">
+          Подробнее
+          <Arrow className="h-3 w-3" />
+        </span>
+        <span className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5 md:left-3.5 md:top-3.5">
           {off > 0 && (
             <span className="rounded-full bg-brass px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-ink md:text-xs">
               −{off}%
@@ -1370,15 +1404,19 @@ function ProductCard({ product, style }: { product: (typeof PRODUCTS)[number]; s
               {product.tag}
             </span>
           )}
-        </div>
-      </div>
+        </span>
+      </button>
 
       <div className="flex flex-1 flex-col justify-between gap-3 p-3.5 md:p-5">
         <div>
           <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brass md:text-[11px]">
             {product.category} · {product.sku}
           </span>
-          <h3 className="mt-2 text-sm font-bold leading-5 text-bone md:text-base md:leading-6">{product.name}</h3>
+          <h3 className="mt-2 text-sm font-bold leading-5 text-bone md:text-base md:leading-6">
+            <button type="button" onClick={open} className="text-left transition-colors hover:text-brass">
+              {product.name}
+            </button>
+          </h3>
         </div>
 
         <div className="flex flex-col gap-3">
@@ -1962,6 +2000,7 @@ function Faq() {
 
 function Contacts() {
   const reveal = useStaggeredReveal()
+  const { openLegal } = useUi()
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [note, setNote] = useState('')
@@ -2084,8 +2123,15 @@ function Contacts() {
             </button>
 
             <p className="text-[11px] leading-4 text-ash">
-              Нажимая кнопку, вы соглашаетесь на обработку персональных данных. Заявка откроется в WhatsApp — так мы
-              отвечаем быстрее всего.
+              Нажимая кнопку, вы соглашаетесь на обработку персональных данных в соответствии с{' '}
+              <button
+                type="button"
+                onClick={() => openLegal('privacy')}
+                className="underline decoration-bone/30 underline-offset-2 transition-colors hover:text-brass"
+              >
+                политикой конфиденциальности
+              </button>
+              . Заявка откроется в WhatsApp — так мы отвечаем быстрее всего.
             </p>
           </form>
         </div>
@@ -2099,6 +2145,8 @@ function Contacts() {
  * ------------------------------------------------------------------ */
 
 function Footer() {
+  const { openLegal } = useUi()
+
   return (
     <footer className="w-full border-t border-bone/10 px-3 pb-28 pt-12 md:px-5 md:pt-16 lg:pb-16">
       <div className="mx-auto max-w-[1600px]">
@@ -2166,6 +2214,23 @@ function Footer() {
             сертификат в бумажной и электронной версии (заверенный государственными структурами), свидетельствующий о
             том, что данные товары являются сувенирными изделиями.
           </p>
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <button
+              type="button"
+              onClick={() => openLegal('privacy')}
+              className="text-xs font-semibold text-ash underline decoration-bone/25 underline-offset-4 transition-colors hover:text-brass"
+            >
+              Политика конфиденциальности
+            </button>
+            <button
+              type="button"
+              onClick={() => openLegal('offer')}
+              className="text-xs font-semibold text-ash underline decoration-bone/25 underline-offset-4 transition-colors hover:text-brass"
+            >
+              Договор оферты
+            </button>
+          </div>
+
           <p className="mt-5 text-[11px] text-ash/60">
             © {new Date().getFullYear()} Казачья Кузня. Копирование материалов сайта разрешается только с указанием
             ссылки на первоисточник.
@@ -2231,6 +2296,338 @@ function MobileActionBar() {
 }
 
 /* ------------------------------------------------------------------ *
+ * Общая оболочка модальных окон
+ * ------------------------------------------------------------------ */
+
+function Modal({
+  open,
+  onClose,
+  label,
+  title,
+  children,
+  wide = false,
+}: {
+  open: boolean
+  onClose: () => void
+  label: string
+  title: ReactNode
+  children: ReactNode
+  wide?: boolean
+}) {
+  useEffect(() => {
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [open, onClose])
+
+  if (!open) return null
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center sm:p-4 md:p-6">
+      <button
+        type="button"
+        aria-label="Закрыть"
+        onClick={onClose}
+        className="absolute inset-0 h-full w-full cursor-default bg-ink/80 backdrop-blur-sm"
+      />
+
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={label}
+        className={`relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl border border-bone/10 bg-coal shadow-2xl sm:max-h-[88vh] sm:rounded-2xl ${
+          wide ? 'sm:max-w-6xl' : 'sm:max-w-3xl'
+        }`}
+      >
+        <div className="flex shrink-0 items-center justify-between gap-4 border-b border-bone/10 px-5 py-4 md:px-7 md:py-5">
+          <div className="min-w-0">{title}</div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Закрыть"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-bone/20 text-bone transition-colors hover:border-brass hover:text-brass"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">{children}</div>
+      </div>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ *
+ * Карточка товара — подробности
+ * ------------------------------------------------------------------ */
+
+function ProductModal({ sku, onClose }: { sku: string | null; onClose: () => void }) {
+  const product = sku ? PRODUCT_BY_SKU.get(sku) : undefined
+  const detail = sku ? PRODUCT_DETAILS[sku] : undefined
+  const [shot, setShot] = useState(0)
+
+  useEffect(() => setShot(0), [sku])
+
+  if (!product) return null
+
+  const shots = [product.image, ...(detail?.gallery ?? [])]
+  const off = discount(product.price, product.oldPrice)
+
+  return (
+    <Modal
+      open
+      wide
+      onClose={onClose}
+      label={product.name}
+      title={
+        <span className="block truncate text-[11px] font-semibold uppercase tracking-[0.18em] text-brass">
+          {product.category} · {product.sku}
+        </span>
+      }
+    >
+      <div className="grid grid-cols-1 gap-6 p-5 md:gap-8 md:p-7 lg:grid-cols-2">
+        {/* Галерея */}
+        <div className="lg:sticky lg:top-0 lg:self-start">
+          <div className="relative aspect-square overflow-hidden rounded-xl bg-steel md:rounded-2xl">
+            <img
+              key={shots[shot]}
+              src={img(shots[shot])}
+              alt={product.name}
+              loading="lazy"
+              decoding="async"
+              width={860}
+              height={860}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            {off > 0 && (
+              <span className="absolute left-3 top-3 rounded-full bg-brass px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-ink">
+                −{off}%
+              </span>
+            )}
+          </div>
+
+          {shots.length > 1 && (
+            <div className="mt-2 flex gap-2">
+              {shots.map((s, i) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setShot(i)}
+                  aria-label={`Фото ${i + 1}`}
+                  aria-current={i === shot}
+                  className={`h-16 w-16 overflow-hidden rounded-lg border transition-colors duration-300 md:h-20 md:w-20 ${
+                    i === shot ? 'border-brass' : 'border-bone/15 hover:border-bone/40'
+                  }`}
+                >
+                  <img
+                    src={img(s)}
+                    alt=""
+                    loading="lazy"
+                    width={160}
+                    height={160}
+                    className="h-full w-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Описание */}
+        <div>
+          <h2 className="font-display text-[clamp(1.5rem,3vw,2.5rem)] font-bold uppercase leading-[1.05] tracking-tight text-bone">
+            {product.name}
+          </h2>
+
+          {detail?.summary && <p className="mt-3 text-sm leading-6 text-ash md:text-base md:leading-7">{detail.summary}</p>}
+
+          <div className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="font-display text-3xl font-bold leading-none text-bone md:text-4xl">
+              {rub(product.price)}
+            </span>
+            <span className="text-sm text-ash line-through">{rub(product.oldPrice)}</span>
+            {off > 0 && (
+              <span className="text-sm font-bold text-brass">выгода {rub(product.oldPrice - product.price)}</span>
+            )}
+          </div>
+
+          <div className="mt-4 flex items-center gap-2">
+            <AddToCartButton sku={product.sku} />
+            <a
+              href={`${CONTACTS.whatsapp}?text=${encodeURIComponent(`Здравствуйте! Подскажите по изделию «${product.name}» (арт. ${product.sku}).`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Спросить в WhatsApp"
+              title="Спросить в WhatsApp"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-bone/25 text-bone transition-colors duration-300 hover:border-brass hover:text-brass md:h-12 md:w-12"
+            >
+              <IconWhatsApp className="h-[18px] w-[18px]" />
+            </a>
+          </div>
+
+          <p className="mt-3 text-[11px] leading-5 text-ash">
+            Изделие сертифицировано и не является холодным оружием. Сертификат — в бумажной и электронной версии.
+            Доставка по РФ и СНГ, оплачивается отдельно по тарифу транспортной компании.
+          </p>
+
+          {detail?.specs.length ? (
+            <div className="mt-7">
+              <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brass">Характеристики</h3>
+              <dl className="mt-3 divide-y divide-bone/10 border-y border-bone/10">
+                {detail.specs.map((s) => (
+                  <div key={s.label} className="flex items-baseline justify-between gap-4 py-2.5">
+                    <dt className="text-sm text-ash">{s.label}</dt>
+                    <dd className="text-right text-sm font-semibold text-bone">{s.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ) : null}
+
+          {detail?.body.length ? (
+            <div className="mt-7">
+              <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brass">Описание</h3>
+              <div className="mt-3 flex flex-col gap-3">
+                {detail.body.map((t, i) => (
+                  <p key={i} className="text-sm leading-6 text-ash md:leading-7">
+                    {t}
+                  </p>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          <p className="mt-6 text-[11px] leading-5 text-ash/80">
+            По запросу делаем гравировку — имя, дату, посвящение или герб подразделения. Если изделия нет в наличии,
+            срок изготовления в среднем 2–3 недели.
+          </p>
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
+/* ------------------------------------------------------------------ *
+ * Юридические документы
+ * ------------------------------------------------------------------ */
+
+function LegalModal({ doc, onClose }: { doc: LegalKey | null; onClose: () => void }) {
+  if (!doc) return null
+  const data = LEGAL[doc]
+
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      label={data.title}
+      title={
+        <span className="block truncate font-display text-base font-bold uppercase tracking-wide text-bone md:text-xl">
+          {data.title}
+        </span>
+      }
+    >
+      <div className="px-5 py-6 md:px-7 md:py-8">
+        <p className="text-[11px] uppercase tracking-[0.18em] text-brass">{CONTACTS.entity}</p>
+
+        {data.sections.map((section, si) => (
+          <section key={si} className="mt-7 first:mt-5">
+            {section.heading && (
+              <h3 className="font-display text-base font-semibold uppercase tracking-wide text-bone md:text-lg">
+                {section.heading}
+              </h3>
+            )}
+            <div className="mt-3 flex flex-col gap-3">
+              {section.items.map((item, ii) => (
+                <p key={ii} className="text-sm leading-6 text-ash md:leading-7">
+                  {item}
+                </p>
+              ))}
+            </div>
+          </section>
+        ))}
+
+        <p className="mt-8 border-t border-bone/10 pt-5 text-[11px] leading-5 text-ash/80">
+          Текст документа приведён в редакции, размещённой на kazachya-kuznya.ru. Вопросы по обработке персональных
+          данных и условиям продажи — на {CONTACTS.email}.
+        </p>
+      </div>
+    </Modal>
+  )
+}
+
+/* ------------------------------------------------------------------ *
+ * Контекст интерфейса: карточка товара и юридические документы
+ * ------------------------------------------------------------------ */
+
+type LegalKey = 'privacy' | 'offer'
+
+const UiContext = createContext<{
+  openProduct: (sku: string) => void
+  openLegal: (doc: LegalKey) => void
+} | null>(null)
+
+function useUi() {
+  const ctx = useContext(UiContext)
+  if (!ctx) throw new Error('useUi вызван вне UiProvider')
+  return ctx
+}
+
+const productHash = (sku: string) => `#product=${encodeURIComponent(sku)}`
+
+function UiProvider({ children }: { children: ReactNode }) {
+  const [product, setProduct] = useState<string | null>(null)
+  const [legal, setLegal] = useState<LegalKey | null>(null)
+
+  // Ссылку на карточку можно скопировать и открыть заново.
+  useEffect(() => {
+    const sync = () => {
+      const m = window.location.hash.match(/^#product=(.+)$/)
+      const sku = m ? decodeURIComponent(m[1]) : null
+      setProduct(sku && PRODUCT_BY_SKU.has(sku) ? sku : null)
+    }
+    sync()
+    window.addEventListener('hashchange', sync)
+    return () => window.removeEventListener('hashchange', sync)
+  }, [])
+
+  const api = useMemo(
+    () => ({
+      openProduct: (sku: string) => {
+        setProduct(sku)
+        if (window.location.hash !== productHash(sku)) {
+          window.history.pushState(null, '', productHash(sku))
+        }
+      },
+      openLegal: (doc: LegalKey) => setLegal(doc),
+    }),
+    [],
+  )
+
+  const closeProduct = useCallback(() => {
+    setProduct(null)
+    if (window.location.hash.startsWith('#product=')) {
+      window.history.pushState(null, '', window.location.pathname + window.location.search)
+    }
+  }, [])
+
+  return (
+    <UiContext.Provider value={api}>
+      {children}
+      <ProductModal sku={product} onClose={closeProduct} />
+      <LegalModal doc={legal} onClose={() => setLegal(null)} />
+    </UiContext.Provider>
+  )
+}
+
+/* ------------------------------------------------------------------ *
  * App
  * ------------------------------------------------------------------ */
 
@@ -2250,7 +2647,8 @@ export default function App() {
 
   return (
     <CartProvider>
-      <div className="bg-ink">
+      <UiProvider>
+        <div className="bg-ink">
         {showSplash && <SplashScreen onComplete={onComplete} />}
         <Navbar />
         <main>
@@ -2265,8 +2663,9 @@ export default function App() {
         </main>
         <Footer />
         <MobileActionBar />
-        <CartDrawer />
-      </div>
+          <CartDrawer />
+        </div>
+      </UiProvider>
     </CartProvider>
   )
 }
