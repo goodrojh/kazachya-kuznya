@@ -506,7 +506,7 @@ function Navbar() {
           >
             <a
               href={CONTACTS.phoneHref}
-              className="block font-display text-2xl font-semibold text-bone transition-colors hover:text-brass"
+              className="block py-1.5 font-display text-2xl font-semibold text-bone transition-colors hover:text-brass"
             >
               {CONTACTS.phone}
             </a>
@@ -1229,13 +1229,13 @@ function Contacts() {
           <div className="mt-8">
             <a
               href={CONTACTS.phoneHref}
-              className="block font-display text-[clamp(1.75rem,5vw,3rem)] font-bold leading-none text-bone transition-colors hover:text-brass"
+              className="block py-2 font-display text-[clamp(1.75rem,5vw,3rem)] font-bold leading-none text-bone transition-colors hover:text-brass"
             >
               {CONTACTS.phone}
             </a>
             <a
               href={`mailto:${CONTACTS.email}`}
-              className="mt-2 inline-block py-1.5 text-sm text-ash transition-colors hover:text-brass"
+              className="mt-1 inline-block py-2.5 text-sm text-ash transition-colors hover:text-brass"
             >
               {CONTACTS.email}
             </a>
@@ -1348,7 +1348,7 @@ function Contacts() {
 
 function Footer() {
   return (
-    <footer className="w-full border-t border-bone/10 px-3 py-12 md:px-5 md:py-16">
+    <footer className="w-full border-t border-bone/10 px-3 pb-28 pt-12 md:px-5 md:pt-16 lg:pb-16">
       <div className="mx-auto max-w-[1600px]">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.2fr_1fr_1fr]">
           <div>
