@@ -80,3 +80,17 @@ node scripts/optimize.mjs    # конвертирует в WebP в public/img
   в компоненте `Contacts`.
 - Ссылки категорий и кнопки «Смотреть» ведут на секцию с товарами. При переезде
   на полноценный каталог их нужно заменить на реальные URL.
+
+## Автодеплой (опционально)
+
+Сейчас сайт выкладывается в ветку `gh-pages` вручную. Чтобы включить сборку на
+GitHub Actions, нужен токен со scope `workflow`:
+
+```bash
+gh auth refresh -s workflow
+mkdir -p .github/workflows
+cp docs/github-pages-workflow.yml .github/workflows/deploy.yml
+git add .github && git commit -m "Добавить автодеплой на GitHub Pages" && git push
+```
+
+После этого в **Settings → Pages** источник нужно переключить на *GitHub Actions*.
