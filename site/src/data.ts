@@ -24,6 +24,7 @@ export const NAV = [
   { label: 'Каталог', href: '#catalog' },
   { label: 'Изделия', href: '#products' },
   { label: 'Производство', href: '#production' },
+  { label: 'Видео', href: '#video' },
   { label: 'Отзывы', href: '#reviews' },
   { label: 'Доставка', href: '#faq' },
   { label: 'Контакты', href: '#contacts' },

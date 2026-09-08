@@ -1617,6 +1617,139 @@ function Production() {
 }
 
 /* ------------------------------------------------------------------ *
+ * Секция — видеообзор
+ * ------------------------------------------------------------------ */
+
+const VIDEO_ID = 'ASFXP6gA2g8'
+/** Изделие, которому посвящён обзор, — чтобы из видео можно было сразу заказать. */
+const VIDEO_SKU = 'KSKR0162'
+
+function VideoReview() {
+  const reveal = useStaggeredReveal()
+  const [playing, setPlaying] = useState(false)
+  const product = PRODUCT_BY_SKU.get(VIDEO_SKU)
+
+  return (
+    <section
+      id="video"
+      ref={(el) => {
+        reveal.containerRef.current = el
+      }}
+      className="w-full px-3 py-16 md:px-5 md:py-24"
+    >
+      <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-1.5 md:gap-2 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)]">
+        {/* Плеер */}
+        <div
+          style={reveal.getAnimStyle(0)}
+          className="group relative aspect-video overflow-hidden rounded-xl bg-steel md:rounded-2xl"
+        >
+          {playing ? (
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`}
+              title="Детальный обзор: шашка генерала Бакланова"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className="absolute inset-0 h-full w-full"
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setPlaying(true)}
+              aria-label="Смотреть видео: детальный обзор шашки генерала Бакланова"
+              className="absolute inset-0 h-full w-full"
+            >
+              <img
+                src={img('video-baklanov')}
+                alt="Кадр из видеообзора шашки генерала Бакланова"
+                loading="lazy"
+                decoding="async"
+                width={1280}
+                height={720}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-smooth group-hover:scale-[1.03]"
+              />
+              <span className="absolute inset-0 bg-ink/25 transition-colors duration-500 group-hover:bg-ink/10" />
+
+              <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-brass text-ink shadow-2xl transition-transform duration-500 ease-smooth group-hover:scale-110 md:h-20 md:w-20">
+                <svg width="22" height="24" viewBox="0 0 22 24" fill="currentColor" aria-hidden="true" className="ml-1">
+                  <path d="M2 1.6v20.8L20 12 2 1.6Z" />
+                </svg>
+              </span>
+
+              <span className="absolute bottom-3 left-3 right-3 flex flex-wrap items-center gap-2 md:bottom-5 md:left-5 md:right-5">
+                <span className="rounded-full bg-ink/70 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-bone backdrop-blur-sm md:text-xs">
+                  Видеообзор
+                </span>
+                <span className="rounded-full bg-ink/70 px-3 py-1.5 text-[10px] font-semibold text-bone/90 backdrop-blur-sm md:text-xs">
+                  Канал «Казачья Кузня»
+                </span>
+              </span>
+            </button>
+          )}
+        </div>
+
+        {/* Текст и переход к изделию */}
+        <div
+          style={reveal.getAnimStyle(1)}
+          className="flex flex-col justify-between gap-7 rounded-xl border border-bone/10 bg-coal p-6 md:rounded-2xl md:p-8"
+        >
+          <div>
+            <SectionLabel index="04">Видеообзор</SectionLabel>
+            <h2 className="mt-4 font-display text-[clamp(1.75rem,3.4vw,3rem)] font-bold uppercase leading-[0.95] tracking-tight text-bone">
+              Посмотрите
+              <br />
+              <span className="text-brass">вблизи</span>
+            </h2>
+            <p className="mt-4 text-sm leading-6 text-ash md:text-base md:leading-7">
+              Детальный обзор шашки генерала Бакланова: клинок, травление, монтаж рукояти и отделка ножен — всё в
+              руках и крупным планом. Так проще понять, что вы получите, чем по фотографиям.
+            </p>
+          </div>
+
+          {product && (
+            <div>
+              <div className="flex items-center gap-3.5 rounded-xl border border-bone/10 bg-steel p-3 md:rounded-2xl md:p-4">
+                <img
+                  src={img(product.image)}
+                  alt={product.name}
+                  loading="lazy"
+                  width={160}
+                  height={160}
+                  className="h-16 w-16 shrink-0 rounded-lg object-cover md:h-20 md:w-20"
+                />
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-brass">
+                    Из видео · {product.sku}
+                  </span>
+                  <h3 className="mt-1 text-sm font-bold leading-5 text-bone">{product.name}</h3>
+                  <div className="mt-1 flex items-baseline gap-2">
+                    <span className="font-display text-lg font-bold leading-none text-bone">{rub(product.price)}</span>
+                    <span className="text-xs text-ash line-through">{rub(product.oldPrice)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center gap-2">
+                <AddToCartButton sku={product.sku} />
+                <a
+                  href={CONTACTS.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Смотреть другие видео на канале"
+                  title="Все видео на канале"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-bone/25 text-bone transition-colors duration-300 hover:border-brass hover:text-brass md:h-12 md:w-12"
+                >
+                  <IconYoutube className="h-5 w-5" />
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------------ *
  * Секция 5 — Отзывы
  * ------------------------------------------------------------------ */
 
@@ -1655,7 +1788,7 @@ function Reviews() {
       <div className="mx-auto max-w-[1600px] px-3 md:px-5">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between" style={reveal.getAnimStyle(0)}>
           <div>
-            <SectionLabel index="04">Отзывы</SectionLabel>
+            <SectionLabel index="05">Отзывы</SectionLabel>
             <h2 className="mt-4 font-display text-[clamp(2.25rem,6vw,5rem)] font-bold uppercase leading-[0.92] tracking-tight text-bone">
               Что говорят
               <br />
@@ -1783,7 +1916,7 @@ function Faq() {
     >
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
         <div style={reveal.getAnimStyle(0)}>
-          <SectionLabel index="05">Доставка и оплата</SectionLabel>
+          <SectionLabel index="06">Доставка и оплата</SectionLabel>
           <h2 className="mt-4 font-display text-[clamp(2.25rem,6vw,5rem)] font-bold uppercase leading-[0.92] tracking-tight text-bone">
             Частые
             <br />
@@ -1851,7 +1984,7 @@ function Contacts() {
           className="flex flex-col justify-between rounded-xl border border-bone/10 bg-steel p-6 md:rounded-2xl md:p-9"
         >
           <div>
-            <SectionLabel index="06">Контакты</SectionLabel>
+            <SectionLabel index="07">Контакты</SectionLabel>
             <h2 className="mt-4 font-display text-[clamp(2rem,5.5vw,4.5rem)] font-bold uppercase leading-[0.92] tracking-tight text-bone">
               Остались
               <br />
@@ -2125,6 +2258,7 @@ export default function App() {
           <Catalog />
           <Products />
           <Production />
+          <VideoReview />
           <Reviews />
           <Faq />
           <Contacts />

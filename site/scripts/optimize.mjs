@@ -4,6 +4,8 @@ const map = {
   // atmosphere / forge
   'l201.jpg':            ['forge-1', 1400, 84],
   'l202.jpg':            ['forge-2', 1400, 84],
+  // превью видео с YouTube
+  'yt-ASFXP6gA2g8.jpg':  ['video-baklanov', 1280, 86],
   // categories
   'cat_shashki.jpg':     ['cat-shashki', 900, 86],
   'cat_sabli.jpg':       ['cat-sabli', 900, 86],

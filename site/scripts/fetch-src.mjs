@@ -5,6 +5,7 @@ import sharp from 'sharp';
 const B = 'https://kazachya-kuznya.ru/wp-content/uploads/';
 const T = 'https://kazachya-kuznya.ru/wp-content/themes/kuznyachiy/assets/img/';
 const urls = [
+  'https://i.ytimg.com/vi/ASFXP6gA2g8/maxresdefault.jpg',
   T+'l201.jpg', T+'l202.jpg', T+'l401.jpg', T+'l402.jpg', T+'l403.jpg', T+'l404.jpg',
   B+'2025/08/cat_accessories.jpg', B+'2025/08/cat_kinzhaly.jpg', B+'2025/08/cat_nozhi.jpg',
   B+'2025/08/cat_sabli.jpg', B+'2025/08/cat_shashki.jpg', B+'2026/02/img_2195.jpeg',
@@ -21,7 +22,8 @@ const urls = [
 ];
 fs.mkdirSync('raw', { recursive: true });
 for (const u of urls) {
-  const name = decodeURIComponent(u.split('/').pop());
+  let name = decodeURIComponent(u.split('/').pop());
+  if (u.includes('ytimg')) name = 'yt-' + u.split('/vi/')[1].split('/')[0] + '.jpg';
   const out = path.join('raw', name);
   if (!fs.existsSync(out)) {
     const r = await fetch(u);
