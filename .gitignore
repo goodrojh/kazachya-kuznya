@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.DS_Store
+*.local
+*.log
+
+# Исходники изображений и служебные выгрузки (в репозиторий не нужны)
+site/raw/
+site/sheet.jpg
+site/rev.jpg
+home.html
+prods.json
