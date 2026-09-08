@@ -3,6 +3,10 @@
  * Тексты, цены, артикулы и реквизиты взяты с kazachya-kuznya.ru.
  */
 
+import { ALL_PRODUCTS, FEATURED_SKUS } from './catalog'
+
+export type { Product } from './catalog'
+
 export const img = (name: string) => `${import.meta.env.BASE_URL}img/${name}.webp`
 
 export const CONTACTS = {
@@ -21,7 +25,7 @@ export const CONTACTS = {
 }
 
 export const NAV = [
-  { label: 'Каталог', href: '#catalog' },
+  { label: 'Каталог', href: '#/catalog' },
   { label: 'Изделия', href: '#products' },
   { label: 'Производство', href: '#production' },
   { label: 'Видео', href: '#video' },
@@ -56,44 +60,11 @@ export const CATEGORIES: Category[] = [
   { slug: 'aksessuary', name: 'Аксессуары', count: 13, blurb: 'Футляры, темляки, портупеи, нагайки', image: 'cat-aksessuary' },
 ]
 
-export type Product = {
-  sku: string
-  name: string
-  category: string
-  price: number
-  oldPrice: number
-  image: string
-  tag?: string
-}
 
-export const PRODUCTS: Product[] = [
-  { sku: 'KSKR014', name: 'Реплика шашка «300 лет Дому Романовых»', category: 'Шашки', price: 22300, oldPrice: 27000, image: 'p-romanov', tag: 'Хит' },
-  { sku: 'KSK0192M', name: 'Шашка кавказская погружная «За Кубань и Отечество», мельхиор', category: 'Шашки', price: 25000, oldPrice: 33000, image: 'p-kuban' },
-  { sku: 'KSKR0161', name: 'Реплика шашка обр. 1838 года «Чаю воскресенья мертвых»', category: 'Шашки', price: 22900, oldPrice: 29000, image: 'p-1838' },
-  { sku: 'KSKR0162', name: 'Реплика шашка генерала Бакланова «Честь дороже чем жизнь»', category: 'Шашки', price: 22900, oldPrice: 29000, image: 'p-baklanov' },
-  { sku: 'KSKR0122', name: 'Реплика шашка «С нами Бог»', category: 'Шашки', price: 22300, oldPrice: 27000, image: 'p-snamibog' },
-  { sku: 'KSK0191M', name: 'Шашка кавказская ККВ, силовая рубка', category: 'Шашки', price: 25000, oldPrice: 33000, image: 'p-kkv' },
-  { sku: 'KSK019M', name: 'Шашка кавказская, мельхиор', category: 'Шашки', price: 24000, oldPrice: 32000, image: 'p-kavkaz' },
-  { sku: 'KSB003B', name: 'Клыч Николаевский парадный', category: 'Сабли', price: 31900, oldPrice: 42000, image: 'p-klych', tag: 'Парадный' },
-  { sku: 'KSBR005M', name: 'Реплика сабля «Боевой талисман», мельхиор', category: 'Сабли', price: 27500, oldPrice: 34200, image: 'p-talisman' },
-  { sku: 'KNJ0021M', name: 'Пластунский нож «Бга бойся, Цря чти»', category: 'Ножи', price: 14900, oldPrice: 21990, image: 'p-nozh-bga' },
-  { sku: 'KNJ0024M', name: 'Пластунский нож «Цену жизни спроси у мертвых»', category: 'Ножи', price: 14900, oldPrice: 21990, image: 'p-nozh-cenu' },
-  { sku: 'KNJ0027M', name: 'Пластунский нож «Отечество или смерть»', category: 'Ножи', price: 14900, oldPrice: 21990, image: 'p-nozh-otech' },
-  { sku: 'KKNR003M', name: 'Реплика кинжал ККВ, мельхиор', category: 'Кинжалы', price: 17900, oldPrice: 20000, image: 'p-kinzhal-kkv' },
-  { sku: 'KKNR001', name: 'Реплика кинжал бебут обр. 1905 г.', category: 'Кинжалы', price: 17300, oldPrice: 22000, image: 'p-bebut' },
-  { sku: 'KPLR001', name: 'Палаш морской обр. 1855 г.', category: 'Палаши', price: 28700, oldPrice: 33900, image: 'p-palash-1855' },
-  { sku: 'KPL002', name: 'Палаш кавалергарда', category: 'Палаши', price: 85000, oldPrice: 105000, image: 'p-kavalergard', tag: 'Коллекция' },
-  { sku: 'KSPR002', name: 'Шпага гвардейская елизаветинская обр. 1740 г.', category: 'Шпаги', price: 25900, oldPrice: 29000, image: 'p-shpaga-1740' },
-  { sku: 'KSPR001', name: 'Шпага пехотная офицерская обр. 1798 г.', category: 'Шпаги', price: 26900, oldPrice: 32000, image: 'p-shpaga-1798' },
-  { sku: 'PYP001', name: 'Японский меч катана «Синоби-Кэн»', category: 'Япония', price: 26990, oldPrice: 34000, image: 'p-katana' },
-  { sku: 'KYP002', name: 'Японский меч вакидзаси «Золотой дракон»', category: 'Япония', price: 28500, oldPrice: 36000, image: 'p-vakidzasi' },
-  { sku: 'PSK016', name: 'Нагайка кубанская, красная', category: 'Аксессуары', price: 3800, oldPrice: 6900, image: 'p-nagayka' },
-  { sku: 'A10', name: 'Футляр подарочный для шашки / сабли, чёрный бархат', category: 'Аксессуары', price: 5000, oldPrice: 7000, image: 'p-futlyar' },
-  { sku: 'TEMP012', name: 'Подставка дубовая для шашки / сабли / катаны', category: 'Аксессуары', price: 2500, oldPrice: 3000, image: 'p-podstavka' },
-  { sku: 'PSK030', name: 'Футляр подарочный для ножа / кортика', category: 'Аксессуары', price: 1800, oldPrice: 5000, image: 'p-futlyar-nozh' },
-]
+/** Витрина на главной — подмножество каталога в заданном порядке. */
+export const PRODUCTS = FEATURED_SKUS.map((sku) => ALL_PRODUCTS.find((p) => p.sku === sku)!).filter(Boolean)
 
-export const PRODUCT_FILTERS = ['Все', 'Шашки', 'Сабли', 'Кинжалы', 'Ножи', 'Палаши', 'Шпаги', 'Япония', 'Аксессуары']
+export const PRODUCT_FILTERS = ['Все', ...CATEGORIES.map((c) => c.name)]
 
 /** Конструктивные особенности — с ответа №6 из FAQ исходного сайта. */
 export const SPECS = [

@@ -8,8 +8,6 @@
     scroll-padding-top: 84px;
     background-color: #0b0b0c;
     -webkit-text-size-adjust: 100%;
-    /* clip, а не hidden: не превращает элемент в скролл-контейнер */
-    overflow-x: clip;
   }
   html,
   body,
@@ -39,6 +37,12 @@
 }
 
 @layer utilities {
+  /* Страховка от горизонтального выезда — на обёртке, а не на html:
+     overflow на корневом элементе ломает программную прокрутку. */
+  .app-shell {
+    overflow-x: clip;
+  }
+
   .h-dvh-safe {
     height: 100vh;
     height: 100svh;

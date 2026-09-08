@@ -25,10 +25,11 @@ import {
   SOCIALS,
   SPECS,
   img,
+  type Product,
   type SocialKey,
 } from './data'
+import { ALL_PRODUCTS, type ProductDetail } from './catalog'
 import { LEGAL } from './legal'
-import { PRODUCT_DETAILS } from './product-details'
 
 /* ------------------------------------------------------------------ *
  * Общие хелперы
@@ -361,7 +362,7 @@ function SocialLinks({ className = '', size = 'md' }: { className?: string; size
  * Корзина
  * ------------------------------------------------------------------ */
 
-const PRODUCT_BY_SKU = new Map(PRODUCTS.map((p) => [p.sku, p]))
+const PRODUCT_BY_SKU = new Map(ALL_PRODUCTS.map((p) => [p.sku, p]))
 const CART_STORAGE_KEY = 'kk-cart-v1'
 
 type CartLine = { sku: string; qty: number }
@@ -492,7 +493,7 @@ function QtyStepper({ sku, qty }: { sku: string; qty: number }) {
         type="button"
         onClick={() => cart.setQty(sku, qty - 1)}
         aria-label="Уменьшить количество"
-        className="flex h-9 w-9 items-center justify-center rounded-full text-lg leading-none text-bone transition-colors hover:text-brass"
+        className="flex h-10 w-10 items-center justify-center rounded-full text-lg leading-none text-bone transition-colors hover:text-brass"
       >
         −
       </button>
@@ -501,7 +502,7 @@ function QtyStepper({ sku, qty }: { sku: string; qty: number }) {
         type="button"
         onClick={() => cart.setQty(sku, qty + 1)}
         aria-label="Увеличить количество"
-        className="flex h-9 w-9 items-center justify-center rounded-full text-lg leading-none text-bone transition-colors hover:text-brass"
+        className="flex h-10 w-10 items-center justify-center rounded-full text-lg leading-none text-bone transition-colors hover:text-brass"
       >
         +
       </button>
@@ -618,7 +619,7 @@ function CartDrawer() {
               Перед оформлением заказа необходимо добавить товары в корзину.
             </p>
             <a
-              href="#products"
+              href="#/catalog"
               onClick={() => setOpen(false)}
               tabIndex={open ? 0 : -1}
               className="mt-7 inline-flex items-center justify-center gap-2.5 rounded-full bg-brass px-7 py-3.5 text-sm font-bold uppercase tracking-wider text-ink transition-colors hover:bg-brass-light"
@@ -809,7 +810,7 @@ function CartDrawer() {
                 type="button"
                 onClick={cart.clear}
                 tabIndex={open ? 0 : -1}
-                className="mt-5 text-xs font-semibold uppercase tracking-wider text-ash transition-colors hover:text-bone"
+                className="mt-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-ash transition-colors hover:text-bone"
               >
                 Очистить корзину
               </button>
@@ -1267,7 +1268,7 @@ function Hero() {
               </h1>
 
               <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-center md:mt-8 md:gap-3">
-                <PrimaryButton href="#catalog">Перейти в каталог</PrimaryButton>
+                <PrimaryButton href="#/catalog">Перейти в каталог</PrimaryButton>
                 <GhostButton href="#production">Как мы куём</GhostButton>
               </div>
             </div>
@@ -1323,7 +1324,7 @@ function Catalog() {
           {CATEGORIES.map((cat, i) => (
             <a
               key={cat.slug}
-              href="#products"
+              href={catalogHref({ cat: cat.slug })}
               style={reveal.getAnimStyle(i + 1)}
               className="group relative aspect-[3/4] overflow-hidden rounded-xl bg-steel md:aspect-[4/5] md:rounded-2xl"
             >
@@ -1365,7 +1366,7 @@ function Catalog() {
  * Секция 3 — Изделия
  * ------------------------------------------------------------------ */
 
-function ProductCard({ product, style }: { product: (typeof PRODUCTS)[number]; style?: CSSProperties }) {
+function ProductCard({ product, style }: { product: Product; style?: CSSProperties }) {
   const { openProduct } = useUi()
   const off = discount(product.price, product.oldPrice)
   const open = () => openProduct(product.sku)
@@ -1529,15 +1530,19 @@ function Products() {
         <div className="mt-8 flex flex-col items-center gap-3 rounded-xl border border-bone/10 bg-steel p-6 text-center md:mt-10 md:flex-row md:justify-between md:rounded-2xl md:p-8 md:text-left">
           <div>
             <h3 className="font-display text-xl font-bold uppercase tracking-wide text-bone md:text-2xl">
-              Не нашли нужное изделие?
+              Это только витрина
             </h3>
             <p className="mt-1.5 text-sm text-ash">
-              Изготовим под заказ за 2–3 недели — с вашими размерами, отделкой и гравировкой.
+              В каталоге {ALL_PRODUCTS.length} изделий с поиском и фильтрами. Нужного нет — изготовим под заказ за 2–3
+              недели, с вашими размерами и гравировкой.
             </p>
           </div>
-          <PrimaryButton href={CONTACTS.whatsapp} external className="shrink-0">
-            Обсудить заказ
-          </PrimaryButton>
+          <div className="flex shrink-0 flex-col gap-2.5 sm:flex-row">
+            <PrimaryButton href="#/catalog">Весь каталог · {ALL_PRODUCTS.length}</PrimaryButton>
+            <GhostButton href={CONTACTS.whatsapp} external>
+              Обсудить заказ
+            </GhostButton>
+          </div>
         </div>
       </div>
     </section>
@@ -2179,7 +2184,10 @@ function Footer() {
             <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5">
               {CATEGORIES.map((c) => (
                 <li key={c.slug}>
-                  <a href="#products" className="inline-block py-2.5 text-sm text-ash transition-colors hover:text-bone">
+                  <a
+                    href={catalogHref({ cat: c.slug })}
+                    className="inline-block py-2.5 text-sm text-ash transition-colors hover:text-bone"
+                  >
                     {c.name}
                   </a>
                 </li>
@@ -2218,14 +2226,14 @@ function Footer() {
             <button
               type="button"
               onClick={() => openLegal('privacy')}
-              className="text-xs font-semibold text-ash underline decoration-bone/25 underline-offset-4 transition-colors hover:text-brass"
+              className="py-2 text-xs font-semibold text-ash underline decoration-bone/25 underline-offset-4 transition-colors hover:text-brass"
             >
               Политика конфиденциальности
             </button>
             <button
               type="button"
               onClick={() => openLegal('offer')}
-              className="text-xs font-semibold text-ash underline decoration-bone/25 underline-offset-4 transition-colors hover:text-brass"
+              className="py-2 text-xs font-semibold text-ash underline decoration-bone/25 underline-offset-4 transition-colors hover:text-brass"
             >
               Договор оферты
             </button>
@@ -2369,9 +2377,31 @@ function Modal({
  * Карточка товара — подробности
  * ------------------------------------------------------------------ */
 
+/** Описания и характеристики — отдельный чанк, грузится при первом открытии карточки. */
+let detailsCache: Record<string, ProductDetail> | null = null
+
+function useProductDetails(active: boolean) {
+  const [details, setDetails] = useState(detailsCache)
+
+  useEffect(() => {
+    if (!active || detailsCache) return
+    let alive = true
+    import('./catalog-details').then((m) => {
+      detailsCache = m.PRODUCT_DETAILS
+      if (alive) setDetails(m.PRODUCT_DETAILS)
+    })
+    return () => {
+      alive = false
+    }
+  }, [active])
+
+  return details
+}
+
 function ProductModal({ sku, onClose }: { sku: string | null; onClose: () => void }) {
   const product = sku ? PRODUCT_BY_SKU.get(sku) : undefined
-  const detail = sku ? PRODUCT_DETAILS[sku] : undefined
+  const details = useProductDetails(Boolean(sku))
+  const detail = sku && details ? details[sku] : undefined
   const [shot, setShot] = useState(0)
 
   useEffect(() => setShot(0), [sku])
@@ -2580,7 +2610,25 @@ function useUi() {
   return ctx
 }
 
-const productHash = (sku: string) => `#product=${encodeURIComponent(sku)}`
+/** Адрес карточки зависит от страницы: на главной — #product=, в каталоге — параметр sku. */
+function productHref(sku: string) {
+  const route = parseRoute(window.location.hash)
+  if (route.page === 'catalog') {
+    const p = new URLSearchParams(route.params)
+    p.set('sku', sku)
+    return `#/catalog?${p}`
+  }
+  return `#product=${encodeURIComponent(sku)}`
+}
+
+function skuFromHash() {
+  const route = parseRoute(window.location.hash)
+  const sku =
+    route.page === 'catalog'
+      ? route.params.get('sku')
+      : (window.location.hash.match(/^#product=(.+)$/) ? decodeURIComponent(RegExp.$1) : null)
+  return sku && PRODUCT_BY_SKU.has(sku) ? sku : null
+}
 
 function UiProvider({ children }: { children: ReactNode }) {
   const [product, setProduct] = useState<string | null>(null)
@@ -2588,11 +2636,7 @@ function UiProvider({ children }: { children: ReactNode }) {
 
   // Ссылку на карточку можно скопировать и открыть заново.
   useEffect(() => {
-    const sync = () => {
-      const m = window.location.hash.match(/^#product=(.+)$/)
-      const sku = m ? decodeURIComponent(m[1]) : null
-      setProduct(sku && PRODUCT_BY_SKU.has(sku) ? sku : null)
-    }
+    const sync = () => setProduct(skuFromHash())
     sync()
     window.addEventListener('hashchange', sync)
     return () => window.removeEventListener('hashchange', sync)
@@ -2602,9 +2646,9 @@ function UiProvider({ children }: { children: ReactNode }) {
     () => ({
       openProduct: (sku: string) => {
         setProduct(sku)
-        if (window.location.hash !== productHash(sku)) {
-          window.history.pushState(null, '', productHash(sku))
-        }
+        const href = productHref(sku)
+        // pushState не поднимает hashchange — страница каталога сохраняет своё состояние.
+        if (window.location.hash !== href) window.history.pushState(null, '', href)
       },
       openLegal: (doc: LegalKey) => setLegal(doc),
     }),
@@ -2613,7 +2657,13 @@ function UiProvider({ children }: { children: ReactNode }) {
 
   const closeProduct = useCallback(() => {
     setProduct(null)
-    if (window.location.hash.startsWith('#product=')) {
+    const route = parseRoute(window.location.hash)
+    if (route.page === 'catalog') {
+      const p = new URLSearchParams(route.params)
+      p.delete('sku')
+      const q = p.toString()
+      window.history.pushState(null, '', `#/catalog${q ? '?' + q : ''}`)
+    } else if (window.location.hash.startsWith('#product=')) {
       window.history.pushState(null, '', window.location.pathname + window.location.search)
     }
   }, [])
@@ -2628,11 +2678,309 @@ function UiProvider({ children }: { children: ReactNode }) {
 }
 
 /* ------------------------------------------------------------------ *
+ * Маршрутизация по хэшу
+ * ------------------------------------------------------------------ */
+
+type Route = { page: 'home' | 'catalog'; params: URLSearchParams }
+
+function parseRoute(hash: string): Route {
+  const raw = hash.replace(/^#/, '')
+  const [pathname, query = ''] = raw.split('?')
+  const params = new URLSearchParams(query)
+  if (pathname === '/catalog') return { page: 'catalog', params }
+  return { page: 'home', params }
+}
+
+function useRoute(): Route {
+  const [route, setRoute] = useState<Route>(() => parseRoute(window.location.hash))
+  useEffect(() => {
+    const sync = () => setRoute(parseRoute(window.location.hash))
+    window.addEventListener('hashchange', sync)
+    return () => window.removeEventListener('hashchange', sync)
+  }, [])
+  return route
+}
+
+/** Ссылка на каталог: `#/catalog?cat=shashki&q=клыч`. */
+const catalogHref = (opts: { cat?: string; q?: string; sort?: string } = {}) => {
+  const p = new URLSearchParams()
+  if (opts.cat && opts.cat !== 'all') p.set('cat', opts.cat)
+  if (opts.q) p.set('q', opts.q)
+  if (opts.sort && opts.sort !== 'popular') p.set('sort', opts.sort)
+  const q = p.toString()
+  return `#/catalog${q ? '?' + q : ''}`
+}
+
+/* ------------------------------------------------------------------ *
+ * Страница каталога
+ * ------------------------------------------------------------------ */
+
+const SORTS = [
+  { key: 'popular', label: 'Популярные' },
+  { key: 'cheap', label: 'Сначала дешевле' },
+  { key: 'expensive', label: 'Сначала дороже' },
+  { key: 'discount', label: 'Больше скидка' },
+] as const
+
+const PAGE_STEP = 24
+
+/** Нормализация для поиска: регистр, ё→е, лишние пробелы. */
+const norm = (s: string) => s.toLowerCase().replace(/ё/g, 'е').replace(/\s+/g, ' ').trim()
+
+function CatalogPage({ params }: { params: URLSearchParams }) {
+  const cat = params.get('cat') ?? 'all'
+  const sort = params.get('sort') ?? 'popular'
+  const urlQuery = params.get('q') ?? ''
+
+  const [query, setQuery] = useState(urlQuery)
+  const [limit, setLimit] = useState(PAGE_STEP)
+
+  // Строку поиска в адрес пишем с задержкой, чтобы не плодить записи в истории.
+  useEffect(() => setQuery(urlQuery), [urlQuery])
+  useEffect(() => {
+    if (query === urlQuery) return
+    const t = setTimeout(() => {
+      window.history.replaceState(null, '', catalogHref({ cat, q: query, sort }))
+    }, 350)
+    return () => clearTimeout(t)
+  }, [query, urlQuery, cat, sort])
+
+  useEffect(() => setLimit(PAGE_STEP), [cat, sort, query])
+
+  const catName = CATEGORIES.find((c) => c.slug === cat)?.name
+
+  const found = useMemo(() => {
+    const q = norm(query)
+    const words = q ? q.split(' ') : []
+    let list = ALL_PRODUCTS.filter((p) => {
+      if (catName && p.category !== catName) return false
+      if (!words.length) return true
+      const haystack = norm(`${p.name} ${p.sku} ${p.category}`)
+      return words.every((w) => haystack.includes(w))
+    })
+
+    if (sort === 'cheap') list = [...list].sort((a, b) => a.price - b.price)
+    else if (sort === 'expensive') list = [...list].sort((a, b) => b.price - a.price)
+    else if (sort === 'discount')
+      list = [...list].sort((a, b) => discount(b.price, b.oldPrice) - discount(a.price, a.oldPrice))
+
+    return list
+  }, [catName, query, sort])
+
+  const visible = found.slice(0, limit)
+  const plural = (n: number) => {
+    const t = n % 100
+    if (t >= 11 && t <= 14) return 'изделий'
+    switch (n % 10) {
+      case 1:
+        return 'изделие'
+      case 2:
+      case 3:
+      case 4:
+        return 'изделия'
+      default:
+        return 'изделий'
+    }
+  }
+
+  return (
+    <main className="w-full px-3 pb-20 pt-[86px] md:px-5 md:pb-28 md:pt-[104px]">
+      <div className="mx-auto max-w-[1600px]">
+        {/* Шапка страницы */}
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <a
+              href="#"
+              className="inline-flex items-center gap-2 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-ash transition-colors hover:text-brass"
+            >
+              <Arrow className="h-3 w-3 rotate-180" />
+              На главную
+            </a>
+            <h1 className="mt-4 font-display text-[clamp(2.25rem,6vw,5rem)] font-bold uppercase leading-[0.92] tracking-tight text-bone">
+              Каталог
+              {catName && (
+                <>
+                  <br />
+                  <span className="text-brass">{catName}</span>
+                </>
+              )}
+            </h1>
+          </div>
+          <p className="max-w-md text-sm leading-6 text-ash">
+            {ALL_PRODUCTS.length} изделий собственного производства: шашки, сабли, палаши, шпаги, кинжалы, ножи,
+            японские мечи и аксессуары. Цены действующие, со скидкой от базовых.
+          </p>
+        </div>
+
+        {/* Поиск */}
+        <div className="relative mt-8 md:mt-10">
+          <span className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-ash" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.7">
+              <circle cx="9" cy="9" r="6.5" />
+              <path d="M14 14l4.5 4.5" strokeLinecap="round" />
+            </svg>
+          </span>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Поиск по названию или артикулу — например, «бакланов» или KSKR014"
+            aria-label="Поиск по каталогу"
+            className="w-full rounded-full border border-bone/15 bg-coal py-4 pl-14 pr-12 text-base text-bone outline-none transition-colors duration-200 placeholder:text-ash/60 focus:border-brass md:py-5"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery('')}
+              aria-label="Очистить поиск"
+              className="absolute right-4 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-ash transition-colors hover:text-bone"
+            >
+              <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        {/* Категории */}
+        <div
+          className="no-scrollbar -mx-3 mt-4 flex gap-2 overflow-x-auto px-3 pb-1 md:mx-0 md:flex-wrap md:px-0"
+          aria-label="Категории"
+        >
+          <a
+            href={catalogHref({ q: query, sort })}
+            aria-current={cat === 'all'}
+            className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 md:px-5 ${
+              cat === 'all' ? 'border-brass bg-brass text-ink' : 'border-bone/20 text-bone/70 hover:border-brass/60 hover:text-bone'
+            }`}
+          >
+            Все
+            <span className={cat === 'all' ? 'text-ink/60' : 'text-ash'}>{ALL_PRODUCTS.length}</span>
+          </a>
+          {CATEGORIES.map((c) => (
+            <a
+              key={c.slug}
+              href={catalogHref({ cat: c.slug, q: query, sort })}
+              aria-current={cat === c.slug}
+              className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 md:px-5 ${
+                cat === c.slug ? 'border-brass bg-brass text-ink' : 'border-bone/20 text-bone/70 hover:border-brass/60 hover:text-bone'
+              }`}
+            >
+              {c.name}
+              <span className={cat === c.slug ? 'text-ink/60' : 'text-ash'}>{c.count}</span>
+            </a>
+          ))}
+        </div>
+
+        {/* Итог и сортировка */}
+        <div className="mt-6 flex flex-col gap-3 border-t border-bone/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-ash">
+            Найдено <span className="font-bold text-bone">{found.length}</span> {plural(found.length)}
+          </p>
+          <label className="flex items-center gap-3">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ash">Сортировка</span>
+            <select
+              value={sort}
+              onChange={(e) => {
+                window.location.hash = catalogHref({ cat, q: query, sort: e.target.value })
+              }}
+              className="rounded-full border border-bone/15 bg-coal px-4 py-2.5 text-sm text-bone outline-none transition-colors focus:border-brass"
+            >
+              {SORTS.map((s) => (
+                <option key={s.key} value={s.key}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        {/* Сетка */}
+        {found.length === 0 ? (
+          <div className="mt-12 flex flex-col items-center rounded-xl border border-bone/10 bg-coal px-6 py-16 text-center md:rounded-2xl">
+            <p className="font-display text-lg font-semibold uppercase tracking-wide text-bone">Ничего не нашлось</p>
+            <p className="mt-2 max-w-sm text-sm leading-6 text-ash">
+              Попробуйте другое слово или откройте всю категорию. Если нужного изделия нет в каталоге — изготовим под
+              заказ за 2–3 недели.
+            </p>
+            <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
+              <a
+                href={catalogHref()}
+                className="inline-flex items-center justify-center gap-2.5 rounded-full border border-bone/25 px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-bone transition-colors hover:border-brass hover:text-brass"
+              >
+                Сбросить фильтры
+              </a>
+              <PrimaryButton href={CONTACTS.whatsapp} external>
+                Обсудить заказ
+              </PrimaryButton>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="mt-6 grid grid-cols-1 gap-1.5 min-[420px]:grid-cols-2 md:gap-2 lg:grid-cols-3 xl:grid-cols-4">
+              {visible.map((p) => (
+                <ProductCard key={p.sku} product={p} />
+              ))}
+            </div>
+
+            {found.length > visible.length && (
+              <div className="mt-6 flex justify-center md:mt-8">
+                <button
+                  type="button"
+                  onClick={() => setLimit((n) => n + PAGE_STEP)}
+                  className="inline-flex items-center gap-2.5 rounded-full border border-bone/25 px-7 py-4 text-sm font-bold uppercase tracking-wider text-bone transition-colors duration-300 hover:border-brass hover:text-brass"
+                >
+                  Показать ещё {Math.min(PAGE_STEP, found.length - visible.length)}
+                </button>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Помощь снизу */}
+        <div className="mt-10 flex flex-col items-center gap-3 rounded-xl border border-bone/10 bg-coal p-6 text-center md:mt-14 md:flex-row md:justify-between md:rounded-2xl md:p-8 md:text-left">
+          <div>
+            <h2 className="font-display text-xl font-bold uppercase tracking-wide text-bone md:text-2xl">
+              Поможем подобрать
+            </h2>
+            <p className="mt-1.5 text-sm text-ash">
+              Подскажем по размерам, балансу и гравировке. Ответим в мессенджере или перезвоним.
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-col gap-2.5 sm:flex-row">
+            <PrimaryButton href={CONTACTS.whatsapp} external>
+              Написать в WhatsApp
+            </PrimaryButton>
+            <GhostButton href={CONTACTS.phoneHref}>{CONTACTS.phone}</GhostButton>
+          </div>
+        </div>
+      </div>
+    </main>
+  )
+}
+
+/* ------------------------------------------------------------------ *
  * App
  * ------------------------------------------------------------------ */
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true)
+  const route = useRoute()
+
+  // Каталог открываем сверху; возврат на главную к якорю — с прокруткой к секции.
+  useEffect(() => {
+    if (route.page === 'catalog') {
+      window.scrollTo({ top: 0 })
+      return
+    }
+    const id = window.location.hash.replace(/^#/, '')
+    if (!id || id.includes('=') || id.startsWith('/')) return
+    const t = setTimeout(() => {
+      const el = document.getElementById(id)
+      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 84 })
+    }, 80)
+    return () => clearTimeout(t)
+  }, [route])
 
   useEffect(() => {
     if (!showSplash) return
@@ -2648,19 +2996,23 @@ export default function App() {
   return (
     <CartProvider>
       <UiProvider>
-        <div className="bg-ink">
+        <div className="app-shell bg-ink">
         {showSplash && <SplashScreen onComplete={onComplete} />}
         <Navbar />
-        <main>
-          <Hero />
-          <Catalog />
-          <Products />
-          <Production />
-          <VideoReview />
-          <Reviews />
-          <Faq />
-          <Contacts />
-        </main>
+        {route.page === 'catalog' ? (
+          <CatalogPage params={route.params} />
+        ) : (
+          <main>
+            <Hero />
+            <Catalog />
+            <Products />
+            <Production />
+            <VideoReview />
+            <Reviews />
+            <Faq />
+            <Contacts />
+          </main>
+        )}
         <Footer />
         <MobileActionBar />
           <CartDrawer />
