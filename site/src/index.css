@@ -47,14 +47,14 @@
     min-height: 100vh;
     min-height: 100svh;
   }
-  /* Unifies the very different studio backdrops of the source photos into one palette. */
+  /* Лёгкая нормализация очень разных студийных фонов — без потери яркости. */
   .photo-tone {
-    filter: saturate(0.45) contrast(1.07) brightness(0.9);
+    filter: saturate(0.94) contrast(1.05) brightness(1.06);
     transition: filter 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .group:hover .photo-tone,
   .group:focus-within .photo-tone {
-    filter: saturate(1) contrast(1) brightness(1);
+    filter: saturate(1.05) contrast(1.05) brightness(1.1);
   }
   .no-scrollbar {
     scrollbar-width: none;

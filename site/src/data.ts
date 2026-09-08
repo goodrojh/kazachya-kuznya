@@ -12,7 +12,8 @@ export const CONTACTS = {
   whatsapp: 'https://wa.me/79883331210',
   telegram: 'https://t.me/kazachyakyznya',
   vk: 'https://vk.com/kazachyakyznya',
-  youtube: 'https://www.youtube.com/@kazachya_kuznya',
+  youtube: 'https://youtube.com/@kazachya_kuznya',
+  avito: 'https://www.avito.ru/brands/kaz_kuz/all/kollektsionirovanie',
   address: 'Краснодарский край, Северский р-н, ПГТ Ильский, ул. Пушкина, д. 51, 353230',
   entity: 'ИП Молчанов Дмитрий Андреевич',
   ogrnip: '322237500183140',
@@ -205,3 +206,13 @@ export const FAQ = [
 ]
 
 export const DELIVERY = ['СДЭК', 'Боксбери', 'Почта России', 'Деловые линии']
+
+export type SocialKey = 'whatsapp' | 'telegram' | 'vk' | 'youtube' | 'avito'
+
+export const SOCIALS: { key: SocialKey; label: string; href: string }[] = [
+  { key: 'whatsapp', label: 'WhatsApp', href: CONTACTS.whatsapp },
+  { key: 'telegram', label: 'Telegram', href: CONTACTS.telegram },
+  { key: 'vk', label: 'ВКонтакте', href: CONTACTS.vk },
+  { key: 'youtube', label: 'YouTube', href: CONTACTS.youtube },
+  { key: 'avito', label: 'Авито', href: CONTACTS.avito },
+]

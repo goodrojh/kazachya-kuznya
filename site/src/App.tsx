@@ -1,11 +1,14 @@
 import {
+  createContext,
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type CSSProperties,
+  type JSX,
   type ReactNode,
 } from 'react'
 import {
@@ -19,8 +22,10 @@ import {
   PRODUCTS,
   PRODUCT_FILTERS,
   REVIEWS,
+  SOCIALS,
   SPECS,
   img,
+  type SocialKey,
 } from './data'
 
 /* ------------------------------------------------------------------ *
@@ -226,6 +231,625 @@ function Arrow({ className = '' }: { className?: string }) {
   )
 }
 
+/* ------------------------------------------------------------------ *
+ * Иконки (инлайн, без внешних библиотек)
+ * ------------------------------------------------------------------ */
+
+type IconProps = { className?: string }
+
+function IconWhatsApp({ className = '' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 1.82c2.16 0 4.19.84 5.72 2.37a8.05 8.05 0 0 1 2.37 5.72c0 4.46-3.63 8.09-8.1 8.09a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.11.82.83-3.04-.2-.31a8.05 8.05 0 0 1-1.24-4.32c0-4.46 3.63-8.09 8.1-8.09Zm-2.4 4.15c-.18 0-.47.07-.72.34-.25.27-.95.93-.95 2.26s.97 2.62 1.11 2.8c.14.18 1.9 2.9 4.62 3.96.65.25 1.15.4 1.54.51.65.2 1.24.18 1.7.11.52-.08 1.6-.65 1.83-1.28.23-.63.23-1.17.16-1.28-.07-.11-.25-.18-.52-.31-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.18-1.34-.8-.72-1.35-1.6-1.5-1.87-.16-.27-.02-.42.12-.55.12-.12.27-.32.4-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.6-1.47-.83-2.01-.22-.53-.44-.46-.6-.46l-.52-.01Z" />
+    </svg>
+  )
+}
+
+function IconTelegram({ className = '' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M21.94 4.3 18.9 19.1c-.23 1.02-.84 1.27-1.7.79l-4.7-3.46-2.27 2.18c-.25.25-.46.46-.94.46l.33-4.78 8.7-7.86c.38-.34-.08-.53-.59-.19L6.98 13.02l-4.63-1.45c-1.01-.31-1.03-1 .21-1.49L20.64 2.9c.84-.31 1.57.19 1.3 1.4Z" />
+    </svg>
+  )
+}
+
+function IconVk({ className = '' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M13.16 18.2c-6.05 0-9.83-4.15-9.98-11.03h3.05c.1 5.05 2.42 7.2 4.18 7.64V7.17h2.9v4.35c1.7-.19 3.48-2.19 4.08-4.35h2.86c-.46 2.65-2.4 4.65-3.77 5.48 1.37.67 3.58 2.42 4.43 5.55h-3.15c-.66-2.09-2.28-3.71-4.45-3.94v3.94h-.15Z" />
+    </svg>
+  )
+}
+
+function IconYoutube({ className = '' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M21.6 7.2a2.52 2.52 0 0 0-1.77-1.78C18.25 5 12 5 12 5s-6.25 0-7.83.42A2.52 2.52 0 0 0 2.4 7.2C2 8.78 2 12 2 12s0 3.22.4 4.8a2.52 2.52 0 0 0 1.77 1.78C5.75 19 12 19 12 19s6.25 0 7.83-.42a2.52 2.52 0 0 0 1.77-1.78C22 15.22 22 12 22 12s0-3.22-.4-4.8ZM10.05 15.02V8.98L15.3 12l-5.25 3.02Z" />
+    </svg>
+  )
+}
+
+/** Фирменный знак Авито — четыре круга. */
+function IconAvito({ className = '' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <circle cx="7" cy="16.4" r="4.6" />
+      <circle cx="17.6" cy="17.4" r="3.6" />
+      <circle cx="9.3" cy="6" r="3.4" />
+      <circle cx="18.4" cy="7.6" r="2.6" />
+    </svg>
+  )
+}
+
+const SOCIAL_ICONS: Record<SocialKey, (p: IconProps) => JSX.Element> = {
+  whatsapp: IconWhatsApp,
+  telegram: IconTelegram,
+  vk: IconVk,
+  youtube: IconYoutube,
+  avito: IconAvito,
+}
+
+function IconCart({ className = '' }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M2.5 3h2.2l2.2 11.2a1.8 1.8 0 0 0 1.77 1.45h8.06a1.8 1.8 0 0 0 1.77-1.42L20.2 6.9H6.1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="9.5" cy="20" r="1.4" fill="currentColor" stroke="none" />
+      <circle cx="17" cy="20" r="1.4" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+function IconTrash({ className = '' }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M4 6.5h16M9.5 6.5V4.8c0-.5.4-.9.9-.9h3.2c.5 0 .9.4.9.9v1.7M6.5 6.5l.9 12.4c0 .6.5 1.1 1.1 1.1h7c.6 0 1.1-.5 1.1-1.1l.9-12.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/** Ряд иконок соцсетей и Авито. */
+function SocialLinks({ className = '', size = 'md' }: { className?: string; size?: 'sm' | 'md' }) {
+  const box = size === 'sm' ? 'h-10 w-10' : 'h-11 w-11'
+  const icon = size === 'sm' ? 'h-[18px] w-[18px]' : 'h-5 w-5'
+  return (
+    <div className={`flex flex-wrap gap-2 ${className}`}>
+      {SOCIALS.map(({ key, label, href }) => {
+        const Icon = SOCIAL_ICONS[key]
+        return (
+          <a
+            key={key}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={label}
+            title={label}
+            className={`flex ${box} items-center justify-center rounded-full border border-bone/20 text-bone/85 transition-colors duration-300 hover:border-brass hover:bg-brass hover:text-ink`}
+          >
+            <Icon className={icon} />
+          </a>
+        )
+      })}
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ *
+ * Корзина
+ * ------------------------------------------------------------------ */
+
+const PRODUCT_BY_SKU = new Map(PRODUCTS.map((p) => [p.sku, p]))
+const CART_STORAGE_KEY = 'kk-cart-v1'
+
+type CartLine = { sku: string; qty: number }
+
+type CartApi = {
+  lines: CartLine[]
+  count: number
+  total: number
+  oldTotal: number
+  open: boolean
+  setOpen: (v: boolean) => void
+  add: (sku: string) => void
+  setQty: (sku: string, qty: number) => void
+  remove: (sku: string) => void
+  clear: () => void
+}
+
+const CartContext = createContext<CartApi | null>(null)
+
+function useCart() {
+  const ctx = useContext(CartContext)
+  if (!ctx) throw new Error('useCart вызван вне CartProvider')
+  return ctx
+}
+
+function readStoredCart(): CartLine[] {
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY)
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return parsed
+      .filter((l) => l && typeof l.sku === 'string' && PRODUCT_BY_SKU.has(l.sku))
+      .map((l) => ({ sku: l.sku as string, qty: Math.min(99, Math.max(1, Number(l.qty) || 1)) }))
+  } catch {
+    return []
+  }
+}
+
+function CartProvider({ children }: { children: ReactNode }) {
+  const [lines, setLines] = useState<CartLine[]>(readStoredCart)
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(lines))
+    } catch {
+      /* приватный режим — просто не сохраняем */
+    }
+  }, [lines])
+
+  const api = useMemo<CartApi>(() => {
+    const totals = lines.reduce(
+      (acc, l) => {
+        const p = PRODUCT_BY_SKU.get(l.sku)
+        if (!p) return acc
+        acc.count += l.qty
+        acc.total += p.price * l.qty
+        acc.oldTotal += p.oldPrice * l.qty
+        return acc
+      },
+      { count: 0, total: 0, oldTotal: 0 },
+    )
+
+    return {
+      lines,
+      ...totals,
+      open,
+      setOpen,
+      add: (sku: string) =>
+        setLines((prev) => {
+          const found = prev.find((l) => l.sku === sku)
+          if (found) return prev.map((l) => (l.sku === sku ? { ...l, qty: Math.min(99, l.qty + 1) } : l))
+          return [...prev, { sku, qty: 1 }]
+        }),
+      setQty: (sku: string, qty: number) =>
+        setLines((prev) =>
+          qty <= 0
+            ? prev.filter((l) => l.sku !== sku)
+            : prev.map((l) => (l.sku === sku ? { ...l, qty: Math.min(99, qty) } : l)),
+        ),
+      remove: (sku: string) => setLines((prev) => prev.filter((l) => l.sku !== sku)),
+      clear: () => setLines([]),
+    }
+  }, [lines, open])
+
+  return <CartContext.Provider value={api}>{children}</CartContext.Provider>
+}
+
+/** Кнопка «В корзину» с подтверждением состояния. */
+function AddToCartButton({ sku, className = '' }: { sku: string; className?: string }) {
+  const cart = useCart()
+  const [justAdded, setJustAdded] = useState(false)
+  const inCart = cart.lines.find((l) => l.sku === sku)
+
+  useEffect(() => {
+    if (!justAdded) return
+    const t = setTimeout(() => setJustAdded(false), 1600)
+    return () => clearTimeout(t)
+  }, [justAdded])
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        cart.add(sku)
+        setJustAdded(true)
+      }}
+      className={`flex h-11 flex-1 items-center justify-center gap-2 rounded-full px-4 text-xs font-bold uppercase tracking-wider transition-all duration-300 active:scale-[0.98] md:h-12 md:text-sm ${
+        justAdded
+          ? 'bg-brass-light text-ink'
+          : inCart
+            ? 'border border-brass bg-brass/15 text-brass hover:bg-brass hover:text-ink'
+            : 'bg-brass text-ink hover:bg-brass-light'
+      } ${className}`}
+    >
+      {justAdded ? 'Добавлено' : inCart ? `В корзине · ${inCart.qty}` : 'В корзину'}
+      {!justAdded && <IconCart className="h-4 w-4" />}
+    </button>
+  )
+}
+
+function QtyStepper({ sku, qty }: { sku: string; qty: number }) {
+  const cart = useCart()
+  return (
+    <div className="flex items-center gap-1 rounded-full border border-bone/20">
+      <button
+        type="button"
+        onClick={() => cart.setQty(sku, qty - 1)}
+        aria-label="Уменьшить количество"
+        className="flex h-9 w-9 items-center justify-center rounded-full text-lg leading-none text-bone transition-colors hover:text-brass"
+      >
+        −
+      </button>
+      <span className="min-w-[1.5rem] text-center text-sm font-bold tabular-nums text-bone">{qty}</span>
+      <button
+        type="button"
+        onClick={() => cart.setQty(sku, qty + 1)}
+        aria-label="Увеличить количество"
+        className="flex h-9 w-9 items-center justify-center rounded-full text-lg leading-none text-bone transition-colors hover:text-brass"
+      >
+        +
+      </button>
+    </div>
+  )
+}
+
+function CartDrawer() {
+  const cart = useCart()
+  const [checkout, setCheckout] = useState(false)
+  const [form, setForm] = useState({ name: '', phone: '', city: '', delivery: DELIVERY[0], note: '' })
+
+  const { open, setOpen, lines, count, total, oldTotal } = cart
+  const saving = oldTotal - total
+
+  useEffect(() => {
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [open, setOpen])
+
+  useEffect(() => {
+    if (!open) setCheckout(false)
+  }, [open])
+
+  useEffect(() => {
+    if (count === 0) setCheckout(false)
+  }, [count])
+
+  const canSend = form.name.trim().length > 1 && form.phone.trim().length > 4
+
+  const submit = () => {
+    const items = lines
+      .map((l, i) => {
+        const p = PRODUCT_BY_SKU.get(l.sku)
+        if (!p) return ''
+        return `${i + 1}. ${p.name} (арт. ${p.sku}) — ${l.qty} шт. × ${rub(p.price)}`
+      })
+      .filter(Boolean)
+      .join('\n')
+
+    const contacts = [
+      `Имя: ${form.name}`,
+      `Телефон: ${form.phone}`,
+      form.city ? `Город: ${form.city}` : null,
+      `Доставка: ${form.delivery}`,
+      form.note ? `Комментарий: ${form.note}` : null,
+    ]
+      .filter(Boolean)
+      .join('\n')
+
+    // Пустые строки между блоками — так заказ читается в чате.
+    const text = ['Здравствуйте! Хочу оформить заказ:', items, `Итого: ${rub(total)}`, contacts].join('\n\n')
+
+    window.open(`${CONTACTS.whatsapp}?text=${encodeURIComponent(text)}`, '_blank', 'noopener')
+  }
+
+  const field =
+    'w-full rounded-xl border border-bone/15 bg-ink px-4 py-3.5 text-base text-bone outline-none transition-colors duration-200 placeholder:text-ash/60 focus:border-brass'
+
+  return (
+    <div className={`fixed inset-0 z-[70] ${open ? '' : 'pointer-events-none'}`} aria-hidden={!open}>
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label="Закрыть корзину"
+        onClick={() => setOpen(false)}
+        className={`absolute inset-0 h-full w-full cursor-default bg-ink/75 backdrop-blur-sm transition-opacity duration-500 ${
+          open ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+
+      <aside
+        role="dialog"
+        aria-label="Корзина"
+        className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-bone/10 bg-coal shadow-2xl transition-transform duration-500 ease-drawer ${
+          open ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="flex shrink-0 items-center justify-between border-b border-bone/10 px-5 py-4 md:px-7 md:py-5">
+          <div className="flex items-baseline gap-2.5">
+            <h2 className="font-display text-xl font-bold uppercase tracking-wide text-bone md:text-2xl">
+              {checkout ? 'Оформление' : 'Корзина'}
+            </h2>
+            {count > 0 && <span className="text-sm font-semibold text-brass">{count}</span>}
+          </div>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Закрыть корзину"
+            tabIndex={open ? 0 : -1}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-bone/20 text-bone transition-colors hover:border-brass hover:text-brass"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        {count === 0 ? (
+          <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
+            <IconCart className="h-12 w-12 text-bone/25" />
+            <p className="mt-5 font-display text-lg font-semibold uppercase tracking-wide text-bone">
+              Ваша корзина пуста
+            </p>
+            <p className="mt-2 max-w-xs text-sm leading-6 text-ash">
+              Перед оформлением заказа необходимо добавить товары в корзину.
+            </p>
+            <a
+              href="#products"
+              onClick={() => setOpen(false)}
+              tabIndex={open ? 0 : -1}
+              className="mt-7 inline-flex items-center justify-center gap-2.5 rounded-full bg-brass px-7 py-3.5 text-sm font-bold uppercase tracking-wider text-ink transition-colors hover:bg-brass-light"
+            >
+              Продолжить покупки
+              <Arrow />
+            </a>
+          </div>
+        ) : checkout ? (
+          <>
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 md:px-7">
+              <p className="text-sm leading-6 text-ash">
+                Оставьте контакты — заказ уйдёт нам в WhatsApp вместе со списком изделий, и мы подтвердим наличие,
+                сроки и стоимость доставки.
+              </p>
+
+              <div className="mt-5 flex flex-col gap-3">
+                <label className="flex flex-col gap-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ash">Имя *</span>
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="Как к вам обращаться"
+                    autoComplete="name"
+                    tabIndex={open ? 0 : -1}
+                    className={field}
+                  />
+                </label>
+
+                <label className="flex flex-col gap-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ash">Телефон *</span>
+                  <input
+                    type="tel"
+                    inputMode="tel"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    placeholder="+7 (___) ___-__-__"
+                    autoComplete="tel"
+                    tabIndex={open ? 0 : -1}
+                    className={field}
+                  />
+                </label>
+
+                <label className="flex flex-col gap-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ash">Город</span>
+                  <input
+                    type="text"
+                    value={form.city}
+                    onChange={(e) => setForm({ ...form, city: e.target.value })}
+                    placeholder="Куда отправить"
+                    autoComplete="address-level2"
+                    tabIndex={open ? 0 : -1}
+                    className={field}
+                  />
+                </label>
+
+                <label className="flex flex-col gap-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ash">Доставка</span>
+                  <select
+                    value={form.delivery}
+                    onChange={(e) => setForm({ ...form, delivery: e.target.value })}
+                    tabIndex={open ? 0 : -1}
+                    className={field}
+                  >
+                    {DELIVERY.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="flex flex-col gap-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ash">Комментарий</span>
+                  <textarea
+                    rows={3}
+                    value={form.note}
+                    onChange={(e) => setForm({ ...form, note: e.target.value })}
+                    placeholder="Гравировка, индивидуальные размеры, пожелания"
+                    tabIndex={open ? 0 : -1}
+                    className={`${field} resize-none`}
+                  />
+                </label>
+              </div>
+
+              <p className="mt-4 text-[11px] leading-5 text-ash">
+                Доставка оплачивается отдельно согласно тарифу транспортной компании. Возможна оплата наличными,
+                картой, переводом или наложенным платежом.
+              </p>
+            </div>
+
+            <div className="shrink-0 border-t border-bone/10 px-5 py-4 md:px-7 md:py-5">
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm font-semibold uppercase tracking-wider text-ash">Итого</span>
+                <span className="font-display text-2xl font-bold text-bone">{rub(total)}</span>
+              </div>
+              <button
+                type="button"
+                disabled={!canSend}
+                onClick={submit}
+                tabIndex={open ? 0 : -1}
+                className="mt-4 flex w-full items-center justify-center gap-2.5 rounded-full bg-brass px-6 py-4 text-sm font-bold uppercase tracking-wider text-ink transition-all duration-300 hover:bg-brass-light active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-bone/15 disabled:text-ash"
+              >
+                Отправить заказ
+                <IconWhatsApp className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setCheckout(false)}
+                tabIndex={open ? 0 : -1}
+                className="mt-2 w-full py-3 text-xs font-bold uppercase tracking-wider text-ash transition-colors hover:text-bone"
+              >
+                Назад в корзину
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 md:px-7 md:py-5">
+              <ul className="divide-y divide-bone/10">
+                {lines.map((line) => {
+                  const p = PRODUCT_BY_SKU.get(line.sku)
+                  if (!p) return null
+                  return (
+                    <li key={line.sku} className="flex gap-3.5 py-4 first:pt-0 md:gap-4">
+                      <img
+                        src={img(p.image)}
+                        alt={p.name}
+                        loading="lazy"
+                        width={160}
+                        height={160}
+                        className="h-20 w-20 shrink-0 rounded-xl object-cover md:h-24 md:w-24"
+                      />
+                      <div className="flex min-w-0 flex-1 flex-col justify-between gap-2.5">
+                        <div>
+                          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-brass">
+                            {p.category} · {p.sku}
+                          </span>
+                          <h3 className="mt-1 text-sm font-bold leading-5 text-bone">{p.name}</h3>
+                          <span className="mt-1 block text-xs text-ash">{rub(p.price)} за шт.</span>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2">
+                          <QtyStepper sku={line.sku} qty={line.qty} />
+                          <div className="flex items-center gap-2">
+                            <span className="font-display text-base font-bold tabular-nums text-bone">
+                              {rub(p.price * line.qty)}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => cart.remove(line.sku)}
+                              aria-label={`Удалить: ${p.name}`}
+                              tabIndex={open ? 0 : -1}
+                              className="flex h-9 w-9 items-center justify-center rounded-full text-ash transition-colors hover:bg-bone/5 hover:text-bone"
+                            >
+                              <IconTrash className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+
+              <button
+                type="button"
+                onClick={cart.clear}
+                tabIndex={open ? 0 : -1}
+                className="mt-5 text-xs font-semibold uppercase tracking-wider text-ash transition-colors hover:text-bone"
+              >
+                Очистить корзину
+              </button>
+            </div>
+
+            <div className="shrink-0 border-t border-bone/10 px-5 py-4 md:px-7 md:py-5">
+              <dl className="flex flex-col gap-1.5 text-sm">
+                <div className="flex justify-between text-ash">
+                  <dt>Товаров</dt>
+                  <dd className="tabular-nums">{count} шт.</dd>
+                </div>
+                {saving > 0 && (
+                  <div className="flex justify-between text-brass">
+                    <dt>Ваша выгода</dt>
+                    <dd className="tabular-nums">−{rub(saving)}</dd>
+                  </div>
+                )}
+                <div className="mt-1 flex items-baseline justify-between border-t border-bone/10 pt-3">
+                  <dt className="text-sm font-semibold uppercase tracking-wider text-bone">Итого</dt>
+                  <dd className="font-display text-2xl font-bold tabular-nums text-bone">{rub(total)}</dd>
+                </div>
+              </dl>
+
+              <button
+                type="button"
+                onClick={() => setCheckout(true)}
+                tabIndex={open ? 0 : -1}
+                className="mt-4 flex w-full items-center justify-center gap-2.5 rounded-full bg-brass px-6 py-4 text-sm font-bold uppercase tracking-wider text-ink transition-all duration-300 hover:bg-brass-light active:scale-[0.98]"
+              >
+                Оформить заказ
+                <Arrow />
+              </button>
+              <p className="mt-2.5 text-center text-[11px] leading-4 text-ash">
+                Доставка рассчитывается отдельно по тарифу транспортной компании
+              </p>
+            </div>
+          </>
+        )}
+      </aside>
+    </div>
+  )
+}
+
+/** Кнопка корзины со счётчиком. */
+function CartButton({ className = '' }: { className?: string }) {
+  const cart = useCart()
+  return (
+    <button
+      type="button"
+      onClick={() => cart.setOpen(true)}
+      aria-label={`Корзина, товаров: ${cart.count}`}
+      className={`relative flex h-11 w-11 items-center justify-center rounded-full border border-bone/20 text-bone transition-colors duration-300 hover:border-brass hover:text-brass ${className}`}
+    >
+      <IconCart className="h-5 w-5" />
+      {cart.count > 0 && (
+        <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-brass px-1 text-[10px] font-bold tabular-nums text-ink">
+          {cart.count}
+        </span>
+      )}
+    </button>
+  )
+}
+
 function SectionLabel({ children, index }: { children: ReactNode; index: string }) {
   return (
     <div className="flex items-center gap-3 text-brass">
@@ -426,14 +1050,18 @@ function Navbar() {
             >
               {CONTACTS.phone}
             </a>
+            <SocialLinks className="hidden xl:flex" size="sm" />
+
             <a
               href={CONTACTS.whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden rounded-full bg-brass px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-ink transition-colors duration-200 hover:bg-brass-light lg:block"
+              className="hidden rounded-full bg-brass px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-ink transition-colors duration-200 hover:bg-brass-light lg:block xl:hidden"
             >
               Написать в WhatsApp
             </a>
+
+            <CartButton />
 
             <button
               type="button"
@@ -576,12 +1204,12 @@ function Hero() {
             style={reveal.getAnimStyle(i)}
             className="relative h-[46px] overflow-hidden rounded-xl md:h-20 md:rounded-2xl"
           >
-            <div className="absolute inset-0 bg-ink/55 backdrop-blur-[2px]" />
+            <div className="absolute inset-0 bg-ink/45 backdrop-blur-[2px]" />
             <div className="relative z-10 flex h-full flex-col items-center justify-center px-3 text-center">
-              <span className="font-display text-sm font-semibold uppercase tracking-wide text-bone md:text-xl">
+              <span className="font-display text-sm font-semibold uppercase leading-tight tracking-wide text-bone md:text-base lg:text-xl">
                 {bar.title}
               </span>
-              <span className="mt-0.5 hidden text-[11px] text-ash md:block">{bar.note}</span>
+              <span className="mt-0.5 hidden text-[11px] leading-tight text-ash lg:block">{bar.note}</span>
             </div>
           </MaskedCard>
         ))}
@@ -596,35 +1224,38 @@ function Hero() {
         style={reveal.getAnimStyle(3)}
         className="relative min-h-[440px] w-full flex-1 overflow-hidden rounded-xl md:min-h-0 md:rounded-2xl"
       >
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/25" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/65 to-ink/15" />
+        <div className="absolute inset-0 bg-gradient-to-br from-ink/75 via-transparent to-transparent" />
 
-        <div className="absolute inset-0 z-10 flex flex-col justify-between p-4 md:p-8">
-          <p className="max-w-[260px] text-xs font-semibold leading-5 text-bone/85 md:max-w-[380px] md:text-sm md:leading-6">
+        <div className="absolute inset-0 z-10 flex flex-col justify-between gap-6 p-4 md:p-8">
+          <p className="max-w-[240px] text-xs font-semibold leading-5 text-bone sm:max-w-[320px] md:max-w-[420px] md:text-sm md:leading-6">
             Мы создаём изделия, которые хранят в себе дух истории, силу и красоту казачьей культуры.
           </p>
 
-          <div>
-            <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.24em] text-brass md:mb-3 md:text-xs">
-              Собственное производство · с 2022 года
-            </span>
-            <h1 className="font-display text-[clamp(2.5rem,11.5vw,10rem)] font-bold uppercase leading-[0.85] tracking-tight text-bone">
-              Казачья
-              <br />
-              <span className="text-brass">Кузня</span>
-            </h1>
+          <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+            <div className="min-w-0">
+              <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.2em] text-brass md:mb-3 md:text-xs md:tracking-[0.24em]">
+                Собственное производство · с 2022 года
+              </span>
+              <h1 className="font-display text-[clamp(2.5rem,10vw,9rem)] font-bold uppercase leading-[0.85] tracking-tight text-bone">
+                Казачья
+                <br />
+                <span className="text-brass">Кузня</span>
+              </h1>
 
-            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center md:mt-8 md:gap-3">
-              <PrimaryButton href="#catalog">Перейти в каталог</PrimaryButton>
-              <GhostButton href="#production">Как мы куём</GhostButton>
+              <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-center md:mt-8 md:gap-3">
+                <PrimaryButton href="#catalog">Перейти в каталог</PrimaryButton>
+                <GhostButton href="#production">Как мы куём</GhostButton>
+              </div>
+            </div>
+
+            <div className="hidden shrink-0 pb-1 text-right lg:block">
+              <span className="block font-display text-4xl font-bold leading-none text-bone">120+</span>
+              <span className="mt-1 block max-w-[160px] text-[11px] leading-4 text-ash">
+                изделий в каталоге: шашки, сабли, палаши, шпаги, кинжалы
+              </span>
             </div>
           </div>
-        </div>
-
-        <div className="absolute bottom-5 right-5 z-10 hidden text-right md:block">
-          <span className="block font-display text-4xl font-bold leading-none text-bone">120+</span>
-          <span className="mt-1 block max-w-[150px] text-[11px] leading-4 text-ash">
-            изделий в каталоге: шашки, сабли, палаши, шпаги, кинжалы
-          </span>
         </div>
       </MaskedCard>
     </section>
@@ -682,7 +1313,7 @@ function Catalog() {
                 height={1125}
                 className="photo-tone absolute inset-0 h-full w-full object-cover group-hover:scale-[1.04]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/45 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/35 to-transparent" />
 
               <div className="relative z-10 flex h-full flex-col justify-between p-3.5 md:p-5">
                 <span className="self-end rounded-full border border-bone/25 bg-ink/40 px-2.5 py-1 text-[10px] font-semibold text-bone/80 backdrop-blur-sm md:text-xs">
@@ -750,22 +1381,27 @@ function ProductCard({ product, style }: { product: (typeof PRODUCTS)[number]; s
           <h3 className="mt-2 text-sm font-bold leading-5 text-bone md:text-base md:leading-6">{product.name}</h3>
         </div>
 
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <span className="block font-display text-xl font-bold leading-none text-bone md:text-2xl">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-baseline gap-2.5">
+            <span className="font-display text-xl font-bold leading-none text-bone md:text-2xl">
               {rub(product.price)}
             </span>
-            <span className="mt-1 block text-xs text-ash line-through">{rub(product.oldPrice)}</span>
+            <span className="text-xs text-ash line-through">{rub(product.oldPrice)}</span>
           </div>
-          <a
-            href={`${CONTACTS.whatsapp}?text=${encodeURIComponent(`Здравствуйте! Интересует «${product.name}» (арт. ${product.sku}).`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Заказать: ${product.name}`}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-bone/25 text-bone transition-colors duration-300 group-hover:border-brass group-hover:bg-brass group-hover:text-ink md:h-12 md:w-12"
-          >
-            <Arrow className="-rotate-45" />
-          </a>
+
+          <div className="flex items-center gap-2">
+            <AddToCartButton sku={product.sku} />
+            <a
+              href={`${CONTACTS.whatsapp}?text=${encodeURIComponent(`Здравствуйте! Подскажите по изделию «${product.name}» (арт. ${product.sku}).`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Спросить в WhatsApp: ${product.name}`}
+              title="Спросить в WhatsApp"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-bone/25 text-bone transition-colors duration-300 hover:border-brass hover:text-brass md:h-12 md:w-12"
+            >
+              <IconWhatsApp className="h-[18px] w-[18px]" />
+            </a>
+          </div>
         </div>
       </div>
     </article>
@@ -1126,7 +1762,7 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
         className="grid transition-all duration-500 ease-smooth"
         style={{ gridTemplateRows: open ? '1fr' : '0fr', opacity: open ? 1 : 0 }}
       >
-        <div className="overflow-hidden">
+        <div className="overflow-hidden" aria-hidden={!open}>
           <p className="max-w-3xl pb-5 pr-10 text-sm leading-6 text-ash md:pb-7 md:text-base md:leading-7">{a}</p>
         </div>
       </div>
@@ -1240,24 +1876,7 @@ function Contacts() {
               {CONTACTS.email}
             </a>
 
-            <div className="mt-6 flex flex-wrap gap-2">
-              {[
-                { label: 'WhatsApp', href: CONTACTS.whatsapp },
-                { label: 'Telegram', href: CONTACTS.telegram },
-                { label: 'ВКонтакте', href: CONTACTS.vk },
-                { label: 'YouTube', href: CONTACTS.youtube },
-              ].map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-full border border-bone/20 px-4 py-3 text-xs font-bold uppercase tracking-wider text-bone transition-colors duration-300 hover:border-brass hover:text-brass"
-                >
-                  {s.label}
-                </a>
-              ))}
-            </div>
+            <SocialLinks className="mt-6" />
 
             <p className="mt-6 max-w-sm text-xs leading-5 text-ash">
               Магазин-склад: ст. Северская, Краснодарский край. Производство: Волгоград.
@@ -1400,24 +2019,9 @@ function Footer() {
                   {CONTACTS.email}
                 </a>
               </li>
-              {[
-                { label: 'WhatsApp', href: CONTACTS.whatsapp },
-                { label: 'Telegram', href: CONTACTS.telegram },
-                { label: 'ВКонтакте', href: CONTACTS.vk },
-                { label: 'YouTube', href: CONTACTS.youtube },
-              ].map((s) => (
-                <li key={s.label}>
-                  <a
-                    href={s.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block py-2.5 text-sm text-ash transition-colors hover:text-bone"
-                  >
-                    {s.label}
-                  </a>
-                </li>
-              ))}
             </ul>
+
+            <SocialLinks className="mt-5" size="sm" />
           </div>
         </div>
 
@@ -1444,6 +2048,7 @@ function Footer() {
  * ------------------------------------------------------------------ */
 
 function MobileActionBar() {
+  const cart = useCart()
   const [show, setShow] = useState(false)
   useEffect(() => {
     const onScroll = () => setShow(window.scrollY > window.innerHeight * 0.8)
@@ -1458,10 +2063,10 @@ function MobileActionBar() {
         show ? 'translate-y-0' : 'translate-y-full'
       }`}
     >
-      <div className="grid grid-cols-2 gap-2">
+      <div className="flex items-center gap-2">
         <a
           href={CONTACTS.phoneHref}
-          className="rounded-full border border-bone/25 py-3 text-center text-xs font-bold uppercase tracking-wider text-bone"
+          className="flex h-12 flex-1 items-center justify-center rounded-full border border-bone/25 text-xs font-bold uppercase tracking-wider text-bone"
         >
           Позвонить
         </a>
@@ -1469,10 +2074,24 @@ function MobileActionBar() {
           href={CONTACTS.whatsapp}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-full bg-brass py-3 text-center text-xs font-bold uppercase tracking-wider text-ink"
+          aria-label="Написать в WhatsApp"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-bone/25 text-bone"
         >
-          WhatsApp
+          <IconWhatsApp className="h-5 w-5" />
         </a>
+        <button
+          type="button"
+          onClick={() => cart.setOpen(true)}
+          className="relative flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-brass text-xs font-bold uppercase tracking-wider text-ink"
+        >
+          <IconCart className="h-4 w-4" />
+          Корзина
+          {cart.count > 0 && (
+            <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold tabular-nums text-brass">
+              {cart.count}
+            </span>
+          )}
+        </button>
       </div>
     </div>
   )
@@ -1497,20 +2116,23 @@ export default function App() {
   const onComplete = useCallback(() => setShowSplash(false), [])
 
   return (
-    <div className="bg-ink">
-      {showSplash && <SplashScreen onComplete={onComplete} />}
-      <Navbar />
-      <main>
-        <Hero />
-        <Catalog />
-        <Products />
-        <Production />
-        <Reviews />
-        <Faq />
-        <Contacts />
-      </main>
-      <Footer />
-      <MobileActionBar />
-    </div>
+    <CartProvider>
+      <div className="bg-ink">
+        {showSplash && <SplashScreen onComplete={onComplete} />}
+        <Navbar />
+        <main>
+          <Hero />
+          <Catalog />
+          <Products />
+          <Production />
+          <Reviews />
+          <Faq />
+          <Contacts />
+        </main>
+        <Footer />
+        <MobileActionBar />
+        <CartDrawer />
+      </div>
+    </CartProvider>
   )
 }
